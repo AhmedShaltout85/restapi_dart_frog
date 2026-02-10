@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dart_odbc/dart_odbc.dart';
 import 'package:dotenv/dotenv.dart';
 
 void main() async {

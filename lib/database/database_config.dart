@@ -1,8 +1,11 @@
 // lib/database/database_config.dart
-import 'package:dart_odbc/dart_odbc.dart';
+// ignore_for_file: public_member_api_docs, missing_whitespace_between_adjacent_strings
+
 import 'package:dotenv/dotenv.dart';
 
+///
 class DatabaseConfig {
+  ///
   DatabaseConfig({
     required this.pathToDriver,
     required this.odbcDsn,
