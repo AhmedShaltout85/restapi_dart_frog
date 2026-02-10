@@ -1,0 +1,263 @@
+### API Test File for Dart Frog REST API
+### Use with REST Client extension in VS Code or similar HTTP client tools
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+#####################################
+# Health & Debug Endpoints
+#####################################
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Debug Endpoint
+GET {{baseUrl}}/debug
+
+### Debug Database
+GET {{baseUrl}}/debug_db
+
+### Test Database Connection
+GET {{baseUrl}}/test/db
+
+#####################################
+# Locations API
+#####################################
+
+### Get All Locations
+GET {{baseUrl}}/api/locations
+Accept: {{contentType}}
+
+### Get Location by ID
+GET {{baseUrl}}/api/locations/18
+Accept: {{contentType}}
+
+### Create New Location (POST)
+POST {{baseUrl}}/api/locations
+Content-Type: {{contentType}}
+
+{
+    "address": "Updated Address 12345",
+    "latitude": "30.0444",
+    "longitude": "31.2357",
+    "date": "2026-02-10",
+    "flag": 1,
+    "gisUrl": "https://example.com/gis/110",
+    "handasahName": "mohamed ali1",
+    "technicalName": "ali mohamed1",
+    "isFinished": 0,
+    "isApproved": 0,
+    "callerName": "Ahmed1",
+    "brokenType": "Pipe Leak1",
+    "callerNumber": "+201234567890",
+    "videoCall": 0
+  }
+
+### Update Location
+PUT {{baseUrl}}/api/locations/18
+Content-Type: {{contentType}}
+
+{
+  "Address": "Updated Address 123",
+  "Latitude": "30.0444",
+  "Longtiude": "31.2357",
+  "Date": "2026-02-10T20:15:53",
+  "Flag": 1,
+  "Gis_Url": "https://example.com/gis",
+  "Handasah_Name": "John Doe",
+  "Technical_Name": "Jane Smith",
+  "Is_Finished": 0,
+  "Is_Approved": 1,
+  "Caller_Name": "Ahmed",
+  "Broken_Type": "Pipe Leak",
+  "Caller_Number": "+201234567890",
+  "Video_Call": 1
+}
+
+### Delete Location
+DELETE {{baseUrl}}/api/locations/999
+Accept: {{contentType}}
+
+### OPTIONS Request (CORS Preflight)
+OPTIONS {{baseUrl}}/api/locations/1
+
+#####################################
+# Handasat Tools API
+#####################################
+
+### Get All Handasat Tools
+GET {{baseUrl}}/api/handasat_tools
+Accept: {{contentType}}
+
+### Get Handasat Tool by ID
+GET {{baseUrl}}/api/handasat_tools/1
+Accept: {{contentType}}
+
+### Create New Handasat Tool (POST)
+POST {{baseUrl}}/api/handasat_tools
+Content-Type: {{contentType}}
+
+{
+  "handasah_name": "Ahmed Hassan",
+  "tool_name": "Wrench",
+  "tool_qty": 5
+}
+
+#####################################
+# Hot Line Data API
+#####################################
+
+### Get All Hot Line Data
+GET {{baseUrl}}/api/hot_line_data
+Accept: {{contentType}}
+
+### Get Hot Line Data by ID
+GET {{baseUrl}}/api/hot_line_data/1
+Accept: {{contentType}}
+
+### Create New Hot Line Data (POST)
+POST {{baseUrl}}/api/hot_line_data
+Content-Type: {{contentType}}
+
+{
+  "phone": "0223456789",
+  "mobile": "+201234567890",
+  "title_id": 1,
+  "home_number": "12A",
+  "floor_number_id": 3,
+  "area_id": 5,
+  "side_street": "El-Tahrir Street",
+  "main_street": "Ramses Street",
+  "near_to": "Cairo Tower",
+  "name": "Ahmed Mohamed",
+  "subscribe_no": "SUB12345",
+  "area_no": "AREA001",
+  "email": "ahmed@example.com",
+  "user_id": 1,
+  "source_id": 2,
+  "date_time": "2026-02-10T20:20:00",
+  "notes": "Urgent request",
+  "x": "30.0444",
+  "y": "31.2357",
+  "sig": "SIG123",
+  "keys": "KEY001",
+  "customer_id": 100
+}
+
+#####################################
+# Hot Line Status Data API
+#####################################
+
+### Get All Hot Line Status Data
+GET {{baseUrl}}/api/hot_line_status_data
+Accept: {{contentType}}
+
+### Get Hot Line Status Data by ID
+GET {{baseUrl}}/api/hot_line_status_data/3
+Accept: {{contentType}}
+
+### Create New Hot Line Status Data (POST)
+POST {{baseUrl}}/api/hot_line_status_data
+Content-Type: {{contentType}}
+
+{
+  "street": "Alex Street",
+  "break_length": 10.5,
+  "b_width": 5.2
+}
+
+#####################################
+# Pick Location Handasah API
+#####################################
+
+### Get All Pick Location Handasah
+GET {{baseUrl}}/api/pick_location_handasah
+Accept: {{contentType}}
+
+### Get Pick Location Handasah by ID
+GET {{baseUrl}}/api/pick_location_handasah/10
+Accept: {{contentType}}
+
+### Create New Pick Location Handasah (POST)
+POST {{baseUrl}}/api/pick_location_handasah
+Content-Type: {{contentType}}
+
+{
+  "handasah_name": "Ahmed Hassan",
+  "store_name": "Store 1",
+  "store_number": 10
+}
+
+#####################################
+# Pick Location Users API
+#####################################
+
+### Get All Pick Location Users
+GET {{baseUrl}}/api/pick_location_users
+Accept: {{contentType}}
+
+### Get Pick Location Users by ID
+GET {{baseUrl}}/api/pick_location_users/2002
+Accept: {{contentType}}
+
+### Create New Pick Location User (POST)
+POST {{baseUrl}}/api/pick_location_users
+Content-Type: {{contentType}}
+
+{
+  "user_name": "Mohamed Ali",
+  "latitude": "30.0444",
+  "longitude": "31.2357",
+  "address": "456 Nile St, Cairo"
+}
+
+#####################################
+# Tools Requests API
+#####################################
+
+### Get All Tools Requests
+GET {{baseUrl}}/api/tools_requests
+Accept: {{contentType}}
+
+### Get Tools Request by ID
+GET {{baseUrl}}/api/tools_requests/1
+Accept: {{contentType}}
+
+### Create New Tools Request (POST)
+POST {{baseUrl}}/api/tools_requests
+Content-Type: {{contentType}}
+
+{
+  "handasah_name": "Ahmed Hassan",
+  "tool_name": "Pipe Wrench",
+  "tool_qty": 2,
+  "tech_name": "Mohamed Ali",
+  "request_status": 1,
+  "is_approved": 0,
+  "date": "2026-02-10T20:20:00",
+  "address": "123 Main St, Cairo"
+}
+
+#####################################
+# Tracking Locations API
+#####################################
+
+### Get All Tracking Locations
+GET {{baseUrl}}/api/tracking_locations
+Accept: {{contentType}}
+
+### Get Tracking Location by ID
+GET {{baseUrl}}/api/tracking_locations/1
+Accept: {{contentType}}
+
+### Create New Tracking Location (POST)
+POST {{baseUrl}}/api/tracking_locations
+Content-Type: {{contentType}}
+
+{
+  "user_name": "Mohamed Ali",
+  "latitude": "30.0444",
+  "longitude": "31.2357",
+  "date_time": "2026-02-10T20:20:00",
+  "address": "789 Pyramid Road, Giza"
+}
