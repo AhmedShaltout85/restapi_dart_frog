@@ -14,6 +14,8 @@ class DatabaseConfig {
     required this.host,
     required this.database,
     required this.port,
+    required this.jwtSecret,
+    required this.jwtExpirationHours,
   });
 
   factory DatabaseConfig.fromEnvironment() {
@@ -37,6 +39,10 @@ class DatabaseConfig {
       host: getEnv('DB_HOST', 'localhost'),
       database: getEnv('DB_NAME', 'PickLocationDB'),
       port: int.tryParse(getEnv('DB_PORT', '1433')) ?? 1433,
+      jwtSecret:
+          getEnv('JWT_SECRET', 'default-secret-key-change-in-production'),
+      jwtExpirationHours:
+          int.tryParse(getEnv('JWT_EXPIRATION_HOURS', '24')) ?? 24,
     );
   }
   final String pathToDriver;
@@ -46,6 +52,8 @@ class DatabaseConfig {
   final String host;
   final String database;
   final int port;
+  final String jwtSecret;
+  final int jwtExpirationHours;
 
   // Get connection string
   String get connectionString {

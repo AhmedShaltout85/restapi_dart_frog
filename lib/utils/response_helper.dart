@@ -23,13 +23,17 @@ class ResponseHelper {
     required String message,
     int statusCode = 400,
     dynamic errors,
+    dynamic error, // Added for backward compatibility
   }) {
+    // Use either error or errors parameter
+    final errorData = error ?? errors;
+
     return Response.json(
       statusCode: statusCode,
       body: {
         'success': false,
-        'message': message,
-        if (errors != null) 'errors': errors,
+        'message': errorData != null ? '$message: $errorData' : message,
+        if (errorData != null) 'error': errorData.toString(),
       },
     );
   }

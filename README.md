@@ -1,11 +1,13 @@
 # REST API - MS SQL Database with Dart Frog
 
-A complete RESTful API built with **Dart Frog** and **dart_odbc** for managing MS SQL Server database tables. Features full CRUD operations, type-safe models, and comprehensive error handling.
+A complete RESTful API built with **Dart Frog** and **dart_odbc** for managing MS SQL Server database tables. Features **JWT authentication**, full CRUD operations, type-safe models, and comprehensive error handling.
 
 ## 🚀 Features
 
+- ✅ **JWT Authentication** - Secure token-based authentication with bcrypt password hashing
 - ✅ **8 Database Tables** with full CRUD operations
 - ✅ **RESTful API Endpoints** following industry standards
+- ✅ **Protected Routes** - All API endpoints require authentication
 - ✅ **Safe Type Casting** - Handles database string-to-int conversions automatically
 - ✅ **Standardized JSON Responses** with timestamps
 - ✅ **Repository Pattern** for clean data access layer
@@ -57,7 +59,13 @@ DB_DATABASE=your_database_name
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DRIVER={ODBC Driver 18 for SQL Server}
+
+# JWT Authentication (required)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRATION_HOURS=24
 ```
+
+> **⚠️ Important**: Change `JWT_SECRET` to a strong, random secret key in production!
 
 ### 3. Test Database Connection
 
@@ -81,9 +89,88 @@ For production build:
 dart_frog build
 ```
 
-## 📚 API Endpoints
+## � Authentication
+
+### JWT Token-Based Authentication
+
+All API endpoints (except authentication routes) require a valid JWT token.
+
+#### Public Endpoints (No Authentication Required)
+
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login and get JWT token
+- `GET /health` - Health check
+- `GET /debug` - Debug information
+
+#### Protected Endpoints
+
+All `/api/*` routes require authentication:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### Quick Start
+
+#### 1. Register a New User
+
+```bash
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userName": "testuser",
+    "password": "password123",
+    "role": 1,
+    "controlUnit": "Engineering"
+  }'
+```
+
+#### 2. Login to Get JWT Token
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userName": "testuser",
+    "password": "password123"
+  }'
+```
+
+**Response includes your JWT token - save it!**
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "userId": 2009,
+    "userName": "testuser",
+    "role": 1
+  }
+}
+```
+
+#### 3. Use Token for API Requests
+
+```bash
+curl http://localhost:8080/api/locations \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Token Details:**
+
+- Algorithm: HS256
+- Expiration: 24 hours
+- Security: bcrypt password hashing
+
+---
+
+## �📚 API Endpoints
 
 ### Available Tables & Endpoints
+
+**All endpoints require JWT authentication via `Authorization: Bearer <token>` header**
 
 | Table                  | Base Endpoint                 | Records |
 | ---------------------- | ----------------------------- | ------- |
@@ -96,14 +183,22 @@ dart_frog build
 | Tools Requests         | `/api/tools_requests`         | CRUD    |
 | Tracking Locations     | `/api/tracking_locations`     | CRUD    |
 
+### Authentication Endpoints (Public)
+
+| Endpoint         | Method | Description             |
+| ---------------- | ------ | ----------------------- |
+| `/auth/register` | POST   | Register new user       |
+| `/auth/login`    | POST   | Login and get JWT token |
+
 ### CRUD Operations
 
 For each table, the following operations are supported:
 
-#### 📥 **List All Records**
+#### 📥 **List All Records** (Protected)
 
 ```http
 GET /api/{table}
+Authorization: Bearer YOUR_TOKEN
 ```
 
 **Response:**
@@ -117,26 +212,18 @@ GET /api/{table}
 }
 ```
 
-#### 🔍 **Get Single Record**
+#### 🔍 **Get Single Record** (Protected)
 
 ```http
 GET /api/{table}/{id}
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": { "id": 1, "field1": "value1", ... },
-  "timestamp": "2026-02-10T20:00:00.000Z"
-}
-```
-
-#### ➕ **Create New Record**
+#### ➕ **Create New Record** (Protected)
 
 ```http
 POST /api/{table}
+Authorization: Bearer YOUR_TOKEN
 Content-Type: application/json
 
 {
@@ -145,57 +232,26 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created):**
-
-```json
-{
-  "success": true,
-  "message": "{Table} created successfully",
-  "data": { "id": 123, "field1": "value1", ... },
-  "timestamp": "2026-02-10T20:00:00.000Z"
-}
-```
-
-#### ✏️ **Update Record**
+#### ✏️ **Update Record** (Protected)
 
 ```http
 PUT /api/{table}/{id}
+Authorization: Bearer YOUR_TOKEN
 Content-Type: application/json
 
 {
-  "field1": "new_value1",
-  "field2": "new_value2"
+  "field1": "new_value1"
 }
 ```
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "message": "{Table} updated successfully",
-  "data": { "id": 1, "field1": "new_value1", ... },
-  "timestamp": "2026-02-10T20:00:00.000Z"
-}
-```
-
-#### 🗑️ **Delete Record**
+#### 🗑️ **Delete Record** (Protected)
 
 ```http
 DELETE /api/{table}/{id}
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "message": "{Table} deleted successfully",
-  "timestamp": "2026-02-10T20:00:00.000Z"
-}
-```
-
-### 🔧 Utility Endpoints
+### 🔧 Utility Endpoints (Public)
 
 #### Test Database Connection
 
@@ -213,11 +269,22 @@ GET /debug
 
 ### Using cURL
 
+**All API requests require authentication.** First get a token:
+
+```bash
+# Login and extract token
+TOKEN=$(curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"userName":"testuser","password":"password123"}' \
+  | grep -o '"token":"[^"]*' | cut -d'"' -f4)
+```
+
 #### Create a new location:
 
 ```bash
 curl -X POST http://localhost:8080/api/locations \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
     "address": "123 Main St, Cairo",
     "latitude": "30.0444",
@@ -231,7 +298,8 @@ curl -X POST http://localhost:8080/api/locations \
 #### Get all hot line data:
 
 ```bash
-curl http://localhost:8080/api/hot_line_data
+curl http://localhost:8080/api/hot_line_data \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 #### Update a tools request:
@@ -239,6 +307,7 @@ curl http://localhost:8080/api/hot_line_data
 ```bash
 curl -X PUT http://localhost:8080/api/tools_requests/1 \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
     "toolQty": 5,
     "requestStatus": 2,
@@ -249,12 +318,18 @@ curl -X PUT http://localhost:8080/api/tools_requests/1 \
 #### Delete a tracking location:
 
 ```bash
-curl -X DELETE http://localhost:8080/api/tracking_locations/5
+curl -X DELETE http://localhost:8080/api/tracking_locations/5 \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Using the HTTP Test File
 
-The project includes `api_tests.http` with ready-to-use HTTP requests for all endpoints. Open it in VS Code with the REST Client extension and click "Send Request" above any request.
+The project includes `api_tests.http` with ready-to-use HTTP requests for all endpoints.
+
+1. Run a register request, then login
+2. Copy the token from the login response
+3. Update the `@authToken` variable at the top of the file
+4. Use the REST Client extension in VS Code and click "Send Request" above any request
 
 ## 📁 Project Structure
 
@@ -262,34 +337,31 @@ The project includes `api_tests.http` with ready-to-use HTTP requests for all en
 restapi_dart_frog/
 ├── lib/
 │   ├── database/
-│   │   ├── database_config.dart      # Database configuration
+│   │   ├── database_config.dart      # Database + JWT configuration
 │   │   └── database_helper.dart      # Database connection & query helpers
-│   ├── models/                        # Data models (8 tables)
+│   ├── models/                        # Data models (8 tables + auth)
+│   │   ├── auth_models.dart          # Authentication DTOs
 │   │   ├── locations_model.dart
-│   │   ├── handasat_tools_model.dart
-│   │   ├── hot_line_data_model.dart
-│   │   ├── hot_line_status_data_model.dart
-│   │   ├── pick_location_handasah_model.dart
-│   │   ├── pick_location_users_model.dart
-│   │   ├── tools_requests_model.dart
-│   │   └── tracking_locations_model.dart
-│   └── repositories/                  # Repository pattern implementations
-│       ├── locations_repository.dart
-│       └── ... (one for each model)
+│   │   └── ... (one for each table)
+│   ├── repositories/                  # Repository pattern implementations
+│   │   ├── pick_location_users_repository.dart  # Extended with auth methods
+│   │   └── ... (one for each model)
+│   ├── services/                      # Business logic services
+│   │   ├── jwt_service.dart          # JWT token generation/validation
+│   │   └── auth_service.dart         # Authentication logic
+│   └── middleware/
+│       └── auth_middleware.dart       # JWT validation middleware
 ├── routes/
-│   ├── _middleware.dart               # Global CORS middleware
-│   ├── api/                           # API route handlers
+│   ├── _middleware.dart               # Global middleware (DB + JWT provider)
+│   ├── auth/
+│   │   ├── login.dart                # Login endpoint
+│   │   └── register.dart             # Registration endpoint
+│   ├── api/
+│   │   ├── _middleware.dart          # Authentication middleware for all API routes
 │   │   ├── locations/
-│   │   ├── handasat_tools/
-│   │   ├── hot_line_data/
-│   │   ├── hot_line_status_data/
-│   │   ├── pick_location_handasah/
-│   │   ├── pick_location_users/
-│   │   ├── tools_requests/
-│   │   └── tracking_locations/
-│   ├── test/
-│   │   └── db.dart                    # Database connection test
-│   └── debug.dart                     # Debug endpoint
+│   │   └── ... (one folder for each table)
+│   └── test/
+│       └── db.dart                    # Database connection test
 ├── .env.example                       # Environment variable template
 ├── .env                               # Your environment variables (gitignored)
 ├── api_tests.http                     # HTTP requests test suite
@@ -307,19 +379,6 @@ All models feature:
 - ✅ **Null-safe Field Handling** - Proper null safety throughout
 - ✅ **camelCase ↔ snake_case Conversion** - Automatic field name mapping
 
-### Example Model Usage
-
-```dart
-// From JSON (API request)
-final location = Locations.fromJson(jsonData);
-
-// From Database Row
-final location = Locations.fromDb(dbRow);
-
-// To JSON (API response)
-final jsonData = location.toJson();
-```
-
 ## 🛡️ Error Handling
 
 The API provides comprehensive HTTP error codes:
@@ -329,8 +388,9 @@ The API provides comprehensive HTTP error codes:
 | 200  | OK                    | Request successful            |
 | 201  | Created               | Resource created successfully |
 | 400  | Bad Request           | Invalid request data          |
+| 401  | Unauthorized          | Missing or invalid token      |
+| 403  | Forbidden             | Token expired                 |
 | 404  | Not Found             | Resource doesn't exist        |
-| 405  | Method Not Allowed    | HTTP method not supported     |
 | 422  | Validation Error      | Request validation failed     |
 | 500  | Internal Server Error | Server-side error occurred    |
 
@@ -347,6 +407,10 @@ The API provides comprehensive HTTP error codes:
 
 ## 🔐 Security Features
 
+- ✅ **JWT Authentication** - Token-based authentication for all API endpoints
+- ✅ **Password Hashing** - Bcrypt with automatic salt generation
+- ✅ **Protected Routes** - Authentication middleware on all `/api/*` endpoints
+- ✅ **Token Expiration** - 24-hour token lifetime (configurable)
 - ✅ **Environment Variables** - Sensitive data in `.env` file
 - ✅ **SQL Parameterization** - Protection against SQL injection
 - ✅ **Type Validation** - Runtime type checking and casting
@@ -371,16 +435,7 @@ dart test
 
 ### Safe Type Casting
 
-The API automatically handles cases where the MS SQL Database returns string values instead of expected numeric types. Each model includes safe casting helpers:
-
-```dart
-int? safeIntCast(dynamic value) {
-  if (value == null) return null;
-  if (value is int) return value;
-  if (value is num) return value.toInt();
-  return int.tryParse(value.toString());
-}
-```
+The API automatically handles cases where the MS SQL Database returns string values instead of expected numeric types.
 
 ### Field Naming Convention
 
@@ -398,7 +453,7 @@ int? safeIntCast(dynamic value) {
 
 2. The compiled application will be in `build/`
 
-3. Deploy to your server and set environment variables
+3. Deploy to your server and set environment variables (especially `JWT_SECRET`)
 
 4. Run with:
 

@@ -3,38 +3,96 @@
 
 @baseUrl = http://localhost:8080
 @contentType = application/json
+# Replace this token with the JWT token received from login
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIwMDksInVzZXJOYW1lIjoidGVzdHVzZXIiLCJyb2xlIjoxLCJpYXQiOjE3NzA3NTM0NjgsImV4cCI6MTc3MDgzOTg2OCwiaXNzIjoiZGFydF9mcm9nX2FwaSJ9.b4LWbijmbYX6F6Oz9RpZLX_LQsemM7wE2ouSMa4UZDA
+
+#####################################
+# Authentication API
+#####################################
+
+### Register New User
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "userName": "testuser",
+  "password": "password123",
+  "role": 1,
+  "controlUnit": "Engineering"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "userName": "testuser",
+  "password": "password123"
+}
+
+### Invalid Login (Wrong Password)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "userName": "testuser",
+  "password": "wrongpassword"
+}
+
+### Register Duplicate User (should fail)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "userName": "testuser",
+  "password": "password123"
+}
+
+### Logout (Blacklist Token)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{authToken}}
+
+### Test Token After Logout (should fail with 401)
+GET {{baseUrl}}/api/locations
+Authorization: Bearer {{authToken}}
 
 #####################################
 # Health & Debug Endpoints
 #####################################
 
-### Health Check
+### Health Check (No Auth Required)
 GET {{baseUrl}}/health
 
-### Debug Endpoint
+### Debug Endpoint (No Auth Required)
 GET {{baseUrl}}/debug
 
-### Debug Database
+### Debug Database (No Auth Required)
 GET {{baseUrl}}/debug_db
 
-### Test Database Connection
+### Test Database Connection (No Auth Required)
 GET {{baseUrl}}/test/db
 
+### Redis Health Check (No Auth Required)
+GET {{baseUrl}}/health/redis
+
 #####################################
-# Locations API
+# Locations API (Protected - Requires JWT)
 #####################################
 
-### Get All Locations
+### Get All Locations (Protected)
 GET {{baseUrl}}/api/locations
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
-### Get Location by ID
+### Get Location by ID (Protected)
 GET {{baseUrl}}/api/locations/18
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
-### Create New Location (POST)
+### Create New Location (POST) (Protected)
 POST {{baseUrl}}/api/locations
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
     "address": "Updated Address 12345",
@@ -53,9 +111,10 @@ Content-Type: {{contentType}}
     "videoCall": 0
   }
 
-### Update Location
+### Update Location (Protected)
 PUT {{baseUrl}}/api/locations/18
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "Address": "Updated Address 123",
@@ -74,9 +133,13 @@ Content-Type: {{contentType}}
   "Video_Call": 1
 }
 
-### Delete Location
+### Delete Location (Protected)
 DELETE {{baseUrl}}/api/locations/999
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+### Test Protected Endpoint Without Token (should fail with 401)
+GET {{baseUrl}}/api/locations
 
 ### OPTIONS Request (CORS Preflight)
 OPTIONS {{baseUrl}}/api/locations/1
@@ -88,14 +151,17 @@ OPTIONS {{baseUrl}}/api/locations/1
 ### Get All Handasat Tools
 GET {{baseUrl}}/api/handasat_tools
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Handasat Tool by ID
 GET {{baseUrl}}/api/handasat_tools/1
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Handasat Tool (POST)
 POST {{baseUrl}}/api/handasat_tools
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "handasah_name": "Ahmed Hassan",
@@ -110,14 +176,17 @@ Content-Type: {{contentType}}
 ### Get All Hot Line Data
 GET {{baseUrl}}/api/hot_line_data
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Hot Line Data by ID
 GET {{baseUrl}}/api/hot_line_data/1
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Hot Line Data (POST)
 POST {{baseUrl}}/api/hot_line_data
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "phone": "0223456789",
@@ -151,14 +220,17 @@ Content-Type: {{contentType}}
 ### Get All Hot Line Status Data
 GET {{baseUrl}}/api/hot_line_status_data
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Hot Line Status Data by ID
 GET {{baseUrl}}/api/hot_line_status_data/3
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Hot Line Status Data (POST)
 POST {{baseUrl}}/api/hot_line_status_data
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "street": "Alex Street",
@@ -173,14 +245,17 @@ Content-Type: {{contentType}}
 ### Get All Pick Location Handasah
 GET {{baseUrl}}/api/pick_location_handasah
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Pick Location Handasah by ID
 GET {{baseUrl}}/api/pick_location_handasah/10
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Pick Location Handasah (POST)
 POST {{baseUrl}}/api/pick_location_handasah
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "handasah_name": "Ahmed Hassan",
@@ -195,14 +270,17 @@ Content-Type: {{contentType}}
 ### Get All Pick Location Users
 GET {{baseUrl}}/api/pick_location_users
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Pick Location Users by ID
 GET {{baseUrl}}/api/pick_location_users/2002
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Pick Location User (POST)
 POST {{baseUrl}}/api/pick_location_users
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "user_name": "Mohamed Ali",
@@ -218,14 +296,17 @@ Content-Type: {{contentType}}
 ### Get All Tools Requests
 GET {{baseUrl}}/api/tools_requests
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Tools Request by ID
 GET {{baseUrl}}/api/tools_requests/1
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Tools Request (POST)
 POST {{baseUrl}}/api/tools_requests
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "handasah_name": "Ahmed Hassan",
@@ -245,14 +326,17 @@ Content-Type: {{contentType}}
 ### Get All Tracking Locations
 GET {{baseUrl}}/api/tracking_locations
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Get Tracking Location by ID
 GET {{baseUrl}}/api/tracking_locations/1
 Accept: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Tracking Location (POST)
 POST {{baseUrl}}/api/tracking_locations
 Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
 
 {
   "user_name": "Mohamed Ali",
